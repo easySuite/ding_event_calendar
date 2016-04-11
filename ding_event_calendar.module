@@ -1,0 +1,303 @@
+<?php
+/**
+ * @file
+ * Ding event calendar module.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function ding_event_calendar_init() {
+  drupal_add_css(drupal_get_path('module', 'ding_event_calendar') . '/css/ding_event_calendar.css');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ding_event_calendar_menu() {
+  $items = array();
+
+  $items['calendar/%/%'] = array(
+    'title' => 'Calendar switch',
+    'page callback' => 'ding_event_calendar_callback',
+    'page arguments' => array(1, 2),
+    'access callback' => array('user_access'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['calendar/events/%'] = array(
+    'title' => 'Print events',
+    'page callback' => 'ding_event_calendar_events_callback',
+    'page arguments' => array(2),
+    'access callback' => array('user_access'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * AJAX callback for rendering events calendar.
+ */
+function ding_event_calendar_callback($month, $year, $type = 'ajax') {
+  if ($type == 'ajax') {
+    $date = $year . '-' . sprintf("%02s", $month);
+    $output = _ding_event_calendar_content();
+    $content = _ding_event_calendar_events($date);
+    $commands = array();
+    $commands[] = ajax_command_remove('#eventList');
+    $commands[] = ajax_command_replace('#eventsCalendar', $output);
+    $commands[] = ajax_command_replace('#eventList', $content);
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  else {
+    $output = t("Please enable Javascript!");
+    return $output;
+  }
+}
+
+/**
+ * AJAX callback for rendering events list.
+ */
+function ding_event_calendar_events_callback($date, $type = 'ajax') {
+  if ($type == 'ajax') {
+    $output = _ding_event_calendar_events($date);
+    $commands = array();
+    $commands[] = ajax_command_changed('#eventList', '');
+    $commands[] = ajax_command_replace('#eventList', $output);
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  else {
+    $output = t("Please enable Javascript in your browser.");
+    return $output;
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function ding_event_calendar_block_info() {
+  $blocks['ding-event-calendar'] = array(
+    'info' => t('Event Calendar'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function ding_event_calendar_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'ding-event-calendar':
+      $block['subject'] = t('Event Calendar');
+      $block['content'] = _ding_event_calendar_content();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Returns event calendar block content.
+ */
+function _ding_event_calendar_content() {
+  $month = (int) (arg(1) ? arg(1) : date('m'));
+  $year = (int) (arg(2) ? arg(2) : date('Y'));
+
+  return '<div id="eventsCalendar">' . draw_controls() . draw_calendar($month, $year) . '</div><div id="eventList">' . get_events(date('Y-m-d')) . '</div>';
+}
+
+/**
+ * Returning events list fro given date.
+ */
+function _ding_event_calendar_events($date) {
+  if ((int) arg(1) && (int) arg(2)) {
+    $date = ($date ? $date : date('Y-m'));
+  }
+  else {
+    $date = (arg(2) ? arg(2) : date('Y-m-d'));
+  }
+  return '<div id="eventList">' . get_events($date) . '</div>';
+}
+
+
+/**
+ * Rendering calendar navigation.
+ */
+function draw_controls() {
+  $month = (int) (arg(1) ? arg(1) : date('m'));
+  $year = (int) (arg(2) ? arg(2) : date('Y'));
+
+  if ($month) {
+    $dateObj = DateTime::createFromFormat('!m', $month);
+    $rendered_month = $dateObj->format('F');
+  }
+  else {
+    $dateObj = DateTime::createFromFormat('!m', date('m'));
+    $rendered_month = $dateObj->format('F');
+  }
+
+  drupal_add_library('system', 'drupal.ajax');
+  /* "next month" control */
+  $next_month_link = l(
+    t('>>>'),
+    'calendar/' . ($month != 12 ? $month + 1 : 1) . '/' . ($month != 12 ? $year : $year + 1) . '/nojs',
+    array('attributes' => array('class' => 'use-ajax control next'))
+  );
+
+  /* "previous month" control */
+  $previous_month_link = l(
+    t('<<<'),
+    'calendar/' . ($month != 1 ? $month - 1 : 12) . '/' . ($month != 1 ? $year : $year - 1) . '/nojs',
+    array('attributes' => array('class' => 'use-ajax control prev'))
+  );
+
+  /* bringing the controls together */
+  $controls = '<div class="navi-heading">' . $previous_month_link . '<h2>' . $rendered_month . '</h2>' . $next_month_link . ' </div>';
+
+  return $controls;
+}
+
+/**
+ * Rendering calendar.
+ */
+function draw_calendar($month, $year) {
+  /* draw table */
+  $calendar = '<table cellpadding="0" cellspacing="0" id="calendar">';
+
+  /* table headings */
+  $headings = array(
+    t('Sun'),
+    t('Mon'),
+    t('Tue'),
+    t('Wed'),
+    t('Thu'),
+    t('Fri'),
+    t('Sat'),
+  );
+  $calendar .= '<tr class="calendar-row"><td class="calendar-day-head">' . implode('</td><td class="calendar-day-head">', $headings) . '</td></tr>';
+
+  /* days and weeks vars now ... */
+  $running_day = date('w', mktime(0, 0, 0, $month, 1, $year));
+  $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
+  $days_in_this_week = 1;
+  $day_counter = 0;
+  $dates_array = array();
+
+  /* row for week one */
+  $calendar .= '<tr class="calendar-row">';
+
+  /* print "blank" days until the first of the current week */
+  for ($x = 0; $x < $running_day; $x++) {
+    $calendar .= '<td class="calendar-day-np"> </td>';
+    $days_in_this_week++;
+  }
+
+  /* keep going with days.... */
+  for ($list_day = 1; $list_day <= $days_in_month; $list_day++) {
+    $form_date = $year . '-' . sprintf("%02s", $month) . '-' . sprintf("%02s", $list_day);
+    if ($form_date == date('Y-m-d')) {
+      $calendar .= '<td class="calendar-day current-day">';
+    }
+    else {
+      $calendar .= '<td class="calendar-day">';
+    }
+
+    /* add in the day number */
+    $count = db_query("select count(*) from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:form_date",
+      array(
+        ':form_date' => $form_date,
+      ))->fetchField();
+
+    if ($count > 0) {
+      $list_day_printed = l($list_day, '/calendar/events/' . $form_date, array('attributes' => array('class' => 'use-ajax')));
+    }
+    else {
+      $list_day_printed = $list_day;
+    }
+
+    $calendar .= '<div class="day-number">' . $list_day_printed . '</div>';
+
+    $calendar .= '</td>';
+    if ($running_day == 6) {
+      $calendar .= '</tr>';
+      if (($day_counter + 1) != $days_in_month) {
+        $calendar .= '<tr class="calendar-row">';
+      }
+      $running_day = -1;
+      $days_in_this_week = 0;
+    }
+    $days_in_this_week++;
+    $running_day++;
+    $day_counter++;
+  }
+
+  /* finish the rest of the days in the week */
+  if ($days_in_this_week < 8) {
+    for ($x = 1; $x <= (8 - $days_in_this_week); $x++) {
+      $calendar .= '<td class="calendar-day-np"> </td>';
+    }
+  }
+
+  /* final row */
+  $calendar .= '</tr>';
+
+  /* end the table */
+  $calendar .= '</table>';
+
+  /* all done, return result */
+  return $calendar;
+}
+
+/**
+ * Fetching events list from database.
+ */
+function get_events($date) {
+  if (drupal_strlen($date) == 7) {
+    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m')=:date and date_format(field_ding_event_date_value, '%Y-%m-%d') >= CURRENT_DATE ",
+      array(
+        ':date' => $date,
+      )
+    );
+
+    $rendering_date = date('F', strtotime($date));
+  }
+  else {
+    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:date",
+      array(
+        ':date' => $date,
+      )
+    );
+
+    $rendering_date = date('jS F', strtotime($date));
+  }
+
+  $items = $query->fetchAll();
+
+  if (count($items) > 0) {
+    foreach ($items as $key => $item) {
+      $items[$key] = node_load($item->nid);
+    }
+    return theme('ding_events_list', array(
+      'items' => $items,
+      'date' => $rendering_date,
+    ));
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ding_event_calendar_theme($existing, $type, $theme, $path) {
+  return array(
+    'ding_events_list' => array(
+      'variables' => array('items' => NULL, 'date' => NULL),
+      'path' => $path . '/templates',
+      'template' => 'events-list',
+    ),
+  );
+}

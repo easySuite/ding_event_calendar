@@ -169,18 +169,18 @@ function draw_calendar($month, $year) {
 
   /* table headings */
   $headings = array(
-    t('Sun'),
     t('Mon'),
     t('Tue'),
     t('Wed'),
     t('Thu'),
     t('Fri'),
     t('Sat'),
+    t('Sun'),
   );
   $calendar .= '<tr class="calendar-row"><td class="calendar-day-head">' . implode('</td><td class="calendar-day-head">', $headings) . '</td></tr>';
 
   /* days and weeks vars now ... */
-  $running_day = date('w', mktime(0, 0, 0, $month, 1, $year));
+  $running_day = date('w', mktime(0, 0, 0, $month, 0, $year));
   $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
   $days_in_this_week = 1;
   $day_counter = 0;

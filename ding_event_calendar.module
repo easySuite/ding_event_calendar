@@ -5,13 +5,6 @@
  */
 
 /**
- * Implements hook_init().
- */
-function ding_event_calendar_init() {
-  drupal_add_css(drupal_get_path('module', 'ding_event_calendar') . '/css/ding_event_calendar.css');
-}
-
-/**
  * Implements hook_menu().
  */
 function ding_event_calendar_menu() {
@@ -95,7 +88,12 @@ function ding_event_calendar_block_view($delta = '') {
   switch ($delta) {
     case 'ding-event-calendar':
       $block['subject'] = t('Event Calendar');
-      $block['content'] = _ding_event_calendar_content();
+      $block['content'] = array(
+        '#markup' => _ding_event_calendar_content(),
+        '#attached' => array(
+          'css' => array(drupal_get_path('module', 'ding_event_calendar') . '/css/ding_event_calendar.css'),
+        ),
+      );
       break;
   }
   return $block;
@@ -171,18 +169,18 @@ function draw_calendar($month, $year) {
 
   /* table headings */
   $headings = array(
-    t('Sun'),
     t('Mon'),
     t('Tue'),
     t('Wed'),
     t('Thu'),
     t('Fri'),
     t('Sat'),
+    t('Sun'),
   );
   $calendar .= '<tr class="calendar-row"><td class="calendar-day-head">' . implode('</td><td class="calendar-day-head">', $headings) . '</td></tr>';
 
   /* days and weeks vars now ... */
-  $running_day = date('w', mktime(0, 0, 0, $month, 1, $year));
+  $running_day = date('w', mktime(0, 0, 0, $month, 0, $year));
   $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
   $days_in_this_week = 1;
   $day_counter = 0;

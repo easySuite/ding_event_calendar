@@ -255,24 +255,12 @@ function draw_calendar($month, $year) {
  * Fetching events list from database.
  */
 function get_events($date) {
-  if (drupal_strlen($date) == 7) {
-    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m')=:date and date_format(field_ding_event_date_value, '%Y-%m-%d') >= CURRENT_DATE ",
-      array(
-        ':date' => $date,
-      )
-    );
-
-    $rendering_date = date('F', strtotime($date));
-  }
-  else {
-    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:date",
-      array(
-        ':date' => $date,
-      )
-    );
-
-    $rendering_date = date('jS F', strtotime($date));
-  }
+  $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:date",
+    array(
+      ':date' => $date,
+    )
+  );
+  $rendering_date = date('jS F', strtotime($date));
 
   $items = $query->fetchAll();
 

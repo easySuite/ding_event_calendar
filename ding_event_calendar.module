@@ -277,7 +277,7 @@ function get_events($date) {
       )
     );
 
-    $rendering_date = format_date(strtotime($date), 'custom', 'j. F', NULL, $language->language);
+    $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
   }
 
   $items = $query->fetchAll();

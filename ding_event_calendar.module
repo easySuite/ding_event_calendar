@@ -213,7 +213,6 @@ function draw_calendar($month, $year) {
       $list_day_printed = $list_day;
     }
 
-
     $classes = 'calendar-day';
 
     if ($form_date == date('Y-m-d')) {

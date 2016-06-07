@@ -127,6 +127,8 @@ function _ding_event_calendar_events($date) {
  * Rendering calendar navigation.
  */
 function draw_controls() {
+  global $language;
+
   $month = (int) (arg(1) ? arg(1) : date('m'));
   $year = (int) (arg(2) ? arg(2) : date('Y'));
 
@@ -138,6 +140,8 @@ function draw_controls() {
     $dateObj = DateTime::createFromFormat('!m', date('m'));
     $rendered_month = $dateObj->format('F');
   }
+
+  $rendered_month = format_date(strtotime($rendered_month), 'custom', 'F', NULL, $language->language);
 
   drupal_add_library('system', 'drupal.ajax');
   /* "next month" control */
@@ -255,6 +259,8 @@ function draw_calendar($month, $year) {
  * Fetching events list from database.
  */
 function get_events($date) {
+  global $language;
+
   if (drupal_strlen($date) == 7) {
     $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m')=:date and date_format(field_ding_event_date_value, '%Y-%m-%d') >= CURRENT_DATE ",
       array(
@@ -262,7 +268,7 @@ function get_events($date) {
       )
     );
 
-    $rendering_date = date('F', strtotime($date));
+    $rendering_date = format_date(strtotime($date), 'custom', 'F', NULL, $language->language);
   }
   else {
     $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:date",
@@ -271,7 +277,7 @@ function get_events($date) {
       )
     );
 
-    $rendering_date = date('jS F', strtotime($date));
+    $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
   }
 
   $items = $query->fetchAll();

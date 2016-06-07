@@ -35,7 +35,7 @@ function ding_event_calendar_menu() {
  */
 function ding_event_calendar_callback($month, $year, $type = 'ajax') {
   if ($type == 'ajax') {
-    $date = $year . '-' . sprintf("%02s", $month);
+    $date = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
     $output = _ding_event_calendar_content();
     $content = _ding_event_calendar_events($date);
     $commands = array();
@@ -92,6 +92,7 @@ function ding_event_calendar_block_view($delta = '') {
         '#markup' => _ding_event_calendar_content(),
         '#attached' => array(
           'css' => array(drupal_get_path('module', 'ding_event_calendar') . '/css/ding_event_calendar.css'),
+          'js' => array(drupal_get_path('module', 'ding_event_calendar') . '/js/ding_event_calendar.js'),
         ),
       );
       break;
@@ -198,12 +199,6 @@ function draw_calendar($month, $year) {
   /* keep going with days.... */
   for ($list_day = 1; $list_day <= $days_in_month; $list_day++) {
     $form_date = $year . '-' . sprintf("%02s", $month) . '-' . sprintf("%02s", $list_day);
-    if ($form_date == date('Y-m-d')) {
-      $calendar .= '<td class="calendar-day current-day">';
-    }
-    else {
-      $calendar .= '<td class="calendar-day">';
-    }
 
     /* add in the day number */
     $count = db_query("select count(*) from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:form_date",
@@ -217,6 +212,19 @@ function draw_calendar($month, $year) {
     else {
       $list_day_printed = $list_day;
     }
+
+
+    $classes = 'calendar-day';
+
+    if ($form_date == date('Y-m-d')) {
+      $classes .= ' current-day';
+    }
+
+    if (!empty($count)) {
+      $classes .= ' has-events';
+    }
+
+    $calendar .= "<td class='{$classes}'>";
 
     $calendar .= '<div class="day-number">' . $list_day_printed . '</div>';
 

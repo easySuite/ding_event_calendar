@@ -278,17 +278,16 @@ function get_events($date) {
     $rendering_date = date('jS F', strtotime($date));
   }
 
-  $items = $query->execute()->fetchAll();
+  $result = $query->execute();
 
-  if (count($items) > 0) {
-    foreach ($items as $key => $item) {
-      $items[$key] = node_load($item->nid);
-    }
-    return theme('ding_events_list', array(
-      'items' => $items,
-      'date' => $rendering_date,
-    ));
+  $items = array();
+  foreach ($result as $item) {
+    $items[$item->nid] = node_load($item->nid);
   }
+  return theme('ding_events_list', array(
+    'items' => $items,
+    'date' => $rendering_date,
+  ));
 }
 
 /**

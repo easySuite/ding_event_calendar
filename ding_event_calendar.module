@@ -219,7 +219,7 @@ function draw_calendar($month, $year) {
       $classes .= ' current-day';
     }
 
-    if (!empty($count)) {
+    if (!empty($event_day)) {
       $classes .= ' has-events';
     }
 

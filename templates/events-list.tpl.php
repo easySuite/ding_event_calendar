@@ -27,3 +27,6 @@
     </div>
   <?php endforeach; ?>
 </div>
+<div class="more-link">
+  <?php print l(t('See all events'), 'arrangementer'); ?>
+</div>

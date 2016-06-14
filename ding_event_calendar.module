@@ -210,8 +210,8 @@ function draw_calendar($month, $year) {
     $query->fields('n', array('nid'));
     $query->addField('ed', 'field_ding_event_date_value', 'start');
     $query->addField('ed', 'field_ding_event_date_value2', 'end');
-    $query->where("date_format(ed.field_ding_event_date_value, '%Y-%m-%d') <= :form_date", array(':form_date' => $form_date));
-    $query->where("date_format(ed.field_ding_event_date_value2, '%Y-%m-%d') >= :form_date", array(':form_date' => $form_date));
+    $query->where("date_format(addtime(ed.field_ding_event_date_value, SEC_TO_TIME(7200)), '%Y-%m-%d') <= :form_date", array(':form_date' => $form_date));
+    $query->where("date_format(addtime(ed.field_ding_event_date_value2, SEC_TO_TIME(7200)), '%Y-%m-%d') >= :form_date", array(':form_date' => $form_date));
     $event_day = $query->execute()->fetchAll();
 
     if (empty($event_day)) {
@@ -275,8 +275,9 @@ function get_events($date) {
   $query = db_select('node', 'n');
   $query->join('field_data_field_ding_event_date', 'ed', 'n.nid = ed.entity_id');
   $query->fields('n', array('nid'));
-  $query->where("date_format(ed.field_ding_event_date_value, '%Y-%m-%d') <= :date", array(':date' => $date));
-  $query->where("date_format(ed.field_ding_event_date_value2, '%Y-%m-%d') >= :date", array(':date' => $date));
+  $query->where("date_format(addtime(ed.field_ding_event_date_value, SEC_TO_TIME(7200)), '%Y-%m-%d') <= :date", array(':date' => $date));
+  $query->where("date_format(addtime(ed.field_ding_event_date_value2, SEC_TO_TIME(7200)), '%Y-%m-%d') >= :date", array(':date' => $date));
+  $query->orderBy('ed.field_ding_event_date_value');
 
   $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
 

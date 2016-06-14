@@ -205,14 +205,11 @@ function draw_calendar($month, $year) {
     $form_date = $year . '-' . sprintf("%02s", $month) . '-' . sprintf("%02s", $list_day);
 
     /* add in the day number */
-    $query = db_select('node', 'n');
-    $query->join('field_data_field_ding_event_date', 'ed', 'n.nid = ed.entity_id');
-    $query->fields('n', array('nid'));
-    $query->addField('ed', 'field_ding_event_date_value', 'start');
-    $query->addField('ed', 'field_ding_event_date_value2', 'end');
-    $query->where("date_format(addtime(ed.field_ding_event_date_value, SEC_TO_TIME(7200)), '%Y-%m-%d') <= :form_date", array(':form_date' => $form_date));
-    $query->where("date_format(addtime(ed.field_ding_event_date_value2, SEC_TO_TIME(7200)), '%Y-%m-%d') >= :form_date", array(':form_date' => $form_date));
-    $event_day = $query->execute()->fetchAll();
+    $event_day = db_query("select count(*) from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :form_date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :form_date",
+      array(
+        ':form_date' => $form_date,
+        ':tz' => date('P'),
+      ))->fetchField();
 
     if (empty($event_day)) {
       $list_day_printed = $list_day;
@@ -272,16 +269,13 @@ function draw_calendar($month, $year) {
 function get_events($date) {
   global $language;
 
-  $query = db_select('node', 'n');
-  $query->join('field_data_field_ding_event_date', 'ed', 'n.nid = ed.entity_id');
-  $query->fields('n', array('nid'));
-  $query->where("date_format(addtime(ed.field_ding_event_date_value, SEC_TO_TIME(7200)), '%Y-%m-%d') <= :date", array(':date' => $date));
-  $query->where("date_format(addtime(ed.field_ding_event_date_value2, SEC_TO_TIME(7200)), '%Y-%m-%d') >= :date", array(':date' => $date));
-  $query->orderBy('ed.field_ding_event_date_value');
-
   $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
 
-  $result = $query->execute();
+  $result = db_query("select n.nid from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :date order by ed.field_ding_event_date_value asc",
+    array(
+      ':date' => $date,
+      ':tz' => date('P'),
+    ))->fetchAll();
 
   $items = array();
   foreach ($result as $item) {

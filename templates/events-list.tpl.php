@@ -5,7 +5,7 @@
  */
 ?>
 <div class="event-day-header">
-  <?php print t($date); ?>
+  <?php print $date; ?>
 </div>
 <div class="event-items">
   <?php foreach ($items as $item): ?>
@@ -26,4 +26,7 @@
       </div>
     </div>
   <?php endforeach; ?>
+</div>
+<div class="more-link">
+  <?php print l(t('See all events'), 'arrangementer'); ?>
 </div>

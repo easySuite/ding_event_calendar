@@ -39,22 +39,41 @@ $list-item-background-color-even: #f2f2f2 !default;
       .calendar-day-head {
         background: #d5d5d5;
         font-weight: bold;
+
       }
 
-      td {
-        &.calendar-day.current-day {
-          background-color: #00caff;
-          cursor: pointer;
 
+      td {
+        text-align: center;
+        width: 13.14%;
+
+        &.calendar-day.has-events {
+          background-color: #ccc;
+         
           a {
             color: #fff;
-            width: 100%;
-            height: 100%;
           }
         }
 
-        text-align: center;
-        width: 13.14%;
+        &.calendar-day.has-events.selected {
+          background-color: #00caff;
+
+          a {
+            color: #fff;
+          }
+        }
+
+        &.calendar-day.current-day {
+          .day-number {
+            font-weight: bold;
+          }
+
+          a {
+            width: 100%;
+            height: 100%;
+            font-weight: bold;
+          }
+        }
       }
     }
   }
@@ -99,4 +118,50 @@ $list-item-background-color-even: #f2f2f2 !default;
   font-weight: bold;
   margin: 10px 0 5px;
   font-size: 140%;
+}
+
+#eventsCalendar .navi-heading .prev {
+  border-radius: 50px;
+  background-color: #00CAFE;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  text-indent: -9999px;
+  line-height:0;
+
+  &:hover{
+    text-decoration: none;
+  }
+
+  &:after {
+    display: block;
+    text-indent: -2px;
+    line-height: 30px;
+    content: '\f053';
+    text-align: center;
+    font-family: 'FontAwesome';
+  }
+}
+
+#eventsCalendar .navi-heading .next {
+  border-radius: 50px;
+  background-color: #00CAFE;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  text-indent: -9999px;
+  line-height:0;
+
+  &:hover{
+    text-decoration: none;
+  }
+
+  &:after {
+    display: block;
+    text-indent: 2px;
+    line-height: 30px;
+    content: '\f054';
+    text-align: center;
+    font-family: 'FontAwesome';
+  }
 }

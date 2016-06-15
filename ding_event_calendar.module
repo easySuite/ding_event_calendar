@@ -35,7 +35,7 @@ function ding_event_calendar_menu() {
  */
 function ding_event_calendar_callback($month, $year, $type = 'ajax') {
   if ($type == 'ajax') {
-    $date = $year . '-' . sprintf("%02s", $month);
+    $date = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
     $output = _ding_event_calendar_content();
     $content = _ding_event_calendar_events($date);
     $commands = array();
@@ -92,6 +92,7 @@ function ding_event_calendar_block_view($delta = '') {
         '#markup' => _ding_event_calendar_content(),
         '#attached' => array(
           'css' => array(drupal_get_path('module', 'ding_event_calendar') . '/css/ding_event_calendar.css'),
+          'js' => array(drupal_get_path('module', 'ding_event_calendar') . '/js/ding_event_calendar.js'),
         ),
       );
       break;
@@ -127,6 +128,8 @@ function _ding_event_calendar_events($date) {
  * Rendering calendar navigation.
  */
 function draw_controls() {
+  global $language;
+
   $month = (int) (arg(1) ? arg(1) : date('m'));
   $year = (int) (arg(2) ? arg(2) : date('Y'));
 
@@ -138,6 +141,8 @@ function draw_controls() {
     $dateObj = DateTime::createFromFormat('!m', date('m'));
     $rendered_month = $dateObj->format('F');
   }
+
+  $rendered_month = format_date(strtotime($rendered_month), 'custom', 'F', NULL, $language->language);
 
   drupal_add_library('system', 'drupal.ajax');
   /* "next month" control */
@@ -198,25 +203,32 @@ function draw_calendar($month, $year) {
   /* keep going with days.... */
   for ($list_day = 1; $list_day <= $days_in_month; $list_day++) {
     $form_date = $year . '-' . sprintf("%02s", $month) . '-' . sprintf("%02s", $list_day);
-    if ($form_date == date('Y-m-d')) {
-      $calendar .= '<td class="calendar-day current-day">';
-    }
-    else {
-      $calendar .= '<td class="calendar-day">';
-    }
 
     /* add in the day number */
-    $count = db_query("select count(*) from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:form_date",
+    $event_day = db_query("select count(*) from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :form_date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :form_date",
       array(
         ':form_date' => $form_date,
+        ':tz' => date('P'),
       ))->fetchField();
 
-    if ($count > 0) {
-      $list_day_printed = l($list_day, '/calendar/events/' . $form_date, array('attributes' => array('class' => 'use-ajax')));
-    }
-    else {
+    if (empty($event_day)) {
       $list_day_printed = $list_day;
     }
+    else {
+      $list_day_printed = l($list_day, '/calendar/events/' . $form_date, array('attributes' => array('class' => 'use-ajax')));
+    }
+
+    $classes = 'calendar-day';
+
+    if ($form_date == date('Y-m-d')) {
+      $classes .= ' current-day';
+    }
+
+    if (!empty($event_day)) {
+      $classes .= ' has-events';
+    }
+
+    $calendar .= "<td class='{$classes}'>";
 
     $calendar .= '<div class="day-number">' . $list_day_printed . '</div>';
 
@@ -255,36 +267,24 @@ function draw_calendar($month, $year) {
  * Fetching events list from database.
  */
 function get_events($date) {
-  if (drupal_strlen($date) == 7) {
-    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m')=:date and date_format(field_ding_event_date_value, '%Y-%m-%d') >= CURRENT_DATE ",
-      array(
-        ':date' => $date,
-      )
-    );
+  global $language;
 
-    $rendering_date = date('F', strtotime($date));
+  $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
+
+  $result = db_query("select n.nid from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :date order by ed.field_ding_event_date_value asc",
+    array(
+      ':date' => $date,
+      ':tz' => date('P'),
+    ))->fetchAll();
+
+  $items = array();
+  foreach ($result as $item) {
+    $items[$item->nid] = node_load($item->nid);
   }
-  else {
-    $query = db_query("select n.nid from node n inner join field_data_field_ding_event_date ed where n.nid=ed.entity_id and date_format(field_ding_event_date_value, '%Y-%m-%d')=:date",
-      array(
-        ':date' => $date,
-      )
-    );
-
-    $rendering_date = date('jS F', strtotime($date));
-  }
-
-  $items = $query->fetchAll();
-
-  if (count($items) > 0) {
-    foreach ($items as $key => $item) {
-      $items[$key] = node_load($item->nid);
-    }
-    return theme('ding_events_list', array(
-      'items' => $items,
-      'date' => $rendering_date,
-    ));
-  }
+  return theme('ding_events_list', array(
+    'items' => $items,
+    'date' => $rendering_date,
+  ));
 }
 
 /**

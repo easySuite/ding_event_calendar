@@ -42,59 +42,74 @@
   background: #d5d5d5;
   font-weight: bold;
 }
-/* line 44, ../sass/ding_event_calendar.scss */
+/* line 47, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td {
   text-align: center;
   width: 13.14%;
 }
-/* line 45, ../sass/ding_event_calendar.scss */
-#eventsCalendar #calendar tr td.calendar-day.current-day {
-  background-color: #00caff;
-  cursor: pointer;
+/* line 51, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.has-events {
+  background-color: #ccc;
 }
-/* line 49, ../sass/ding_event_calendar.scss */
-#eventsCalendar #calendar tr td.calendar-day.current-day a {
+/* line 54, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.has-events a {
   color: #fff;
+}
+/* line 59, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.has-events.selected {
+  background-color: #00caff;
+}
+/* line 62, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.has-events.selected a {
+  color: #fff;
+}
+/* line 68, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.current-day .day-number {
+  font-weight: bold;
+}
+/* line 72, ../sass/ding_event_calendar.scss */
+#eventsCalendar #calendar tr td.calendar-day.current-day a {
   width: 100%;
   height: 100%;
+  font-weight: bold;
 }
 
-/* line 63, ../sass/ding_event_calendar.scss */
+/* line 83, ../sass/ding_event_calendar.scss */
 .event-items {
   width: 100%;
   height: auto;
   max-height: 200px;
   overflow-y: auto;
 }
-/* line 69, ../sass/ding_event_calendar.scss */
+/* line 89, ../sass/ding_event_calendar.scss */
 .event-items .event-item {
   padding: 6px;
 }
-/* line 72, ../sass/ding_event_calendar.scss */
+/* line 92, ../sass/ding_event_calendar.scss */
 .event-items .event-item:nth-child(odd) {
   background-color: #e8e8e8;
 }
-/* line 76, ../sass/ding_event_calendar.scss */
+/* line 96, ../sass/ding_event_calendar.scss */
 .event-items .event-item:nth-child(even) {
   background-color: #f2f2f2;
 }
-/* line 80, ../sass/ding_event_calendar.scss */
+/* line 100, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-time {
   display: inline-block;
   float: left;
   margin: 0 10px;
 }
-/* line 86, ../sass/ding_event_calendar.scss */
+/* line 106, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-title {
   display: block;
   overflow: hidden;
 }
-/* line 90, ../sass/ding_event_calendar.scss */
+/* line 110, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-title a {
   text-decoration: underline;
 }
 
-/* line 97, ../sass/ding_event_calendar.scss */
+/* line 117, ../sass/ding_event_calendar.scss */
 .event-day-header {
   text-align: center;
   font-weight: bold;
@@ -102,7 +117,7 @@
   font-size: 140%;
 }
 
-/* line 104, ../sass/ding_event_calendar.scss */
+/* line 124, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev {
   border-radius: 50px;
   background-color: #00CAFE;
@@ -112,11 +127,11 @@
   text-indent: -9999px;
   line-height: 0;
 }
-/* line 113, ../sass/ding_event_calendar.scss */
+/* line 133, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev:hover {
   text-decoration: none;
 }
-/* line 117, ../sass/ding_event_calendar.scss */
+/* line 137, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev:after {
   display: block;
   text-indent: -2px;
@@ -126,7 +141,7 @@
   font-family: 'FontAwesome';
 }
 
-/* line 127, ../sass/ding_event_calendar.scss */
+/* line 147, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next {
   border-radius: 50px;
   background-color: #00CAFE;
@@ -136,11 +151,11 @@
   text-indent: -9999px;
   line-height: 0;
 }
-/* line 136, ../sass/ding_event_calendar.scss */
+/* line 156, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next:hover {
   text-decoration: none;
 }
-/* line 140, ../sass/ding_event_calendar.scss */
+/* line 160, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next:after {
   display: block;
   text-indent: 2px;

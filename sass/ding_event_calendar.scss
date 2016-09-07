@@ -1,5 +1,6 @@
 $list-item-background-color-odd: #e8e8e8 !default;
 $list-item-background-color-even: #f2f2f2 !default;
+
 #eventsCalendar {
 
   .navi-heading {
@@ -48,7 +49,7 @@ $list-item-background-color-even: #f2f2f2 !default;
         width: 13.14%;
 
         &.calendar-day.has-events {
-          background-color: #ccc;
+          background-color: #999;
          
           a {
             color: #fff;

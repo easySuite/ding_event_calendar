@@ -1,115 +1,90 @@
-/* line 5, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading {
   text-align: center;
   vertical-align: middle;
 }
-/* line 8, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading h2 {
   display: inline-block;
 }
-/* line 11, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .control {
   margin-top: 7px;
 }
-/* line 14, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next {
   float: right;
 }
-/* line 17, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev {
   float: left;
 }
-/* line 22, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar {
   width: 100%;
 }
-/* line 24, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar a {
   text-decoration: underline;
   width: 100%;
   height: 100%;
 }
-/* line 31, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr:nth-child(odd) {
   background-color: #e8e8e8;
 }
-/* line 35, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr:nth-child(even) {
   background-color: #f2f2f2;
 }
-/* line 39, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr .calendar-day-head {
   background: #d5d5d5;
   font-weight: bold;
 }
-/* line 46, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td {
   text-align: center;
   width: 13.14%;
 }
-/* line 50, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.has-events {
-  background-color: #ccc;
+  background-color: #999;
 }
-/* line 53, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.has-events a {
   color: #fff;
 }
-/* line 58, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.has-events.selected {
   background-color: #00caff;
 }
-/* line 61, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.has-events.selected a {
   color: #fff;
 }
-/* line 67, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.current-day .day-number {
   font-weight: bold;
 }
-/* line 71, ../sass/ding_event_calendar.scss */
 #eventsCalendar #calendar tr td.calendar-day.current-day a {
   width: 100%;
   height: 100%;
   font-weight: bold;
 }
 
-/* line 82, ../sass/ding_event_calendar.scss */
 .event-items {
   width: 100%;
   height: auto;
   max-height: 200px;
   overflow-y: auto;
 }
-/* line 88, ../sass/ding_event_calendar.scss */
 .event-items .event-item {
   padding: 6px;
 }
-/* line 91, ../sass/ding_event_calendar.scss */
 .event-items .event-item:nth-child(odd) {
   background-color: #e8e8e8;
 }
-/* line 95, ../sass/ding_event_calendar.scss */
 .event-items .event-item:nth-child(even) {
   background-color: #f2f2f2;
 }
-/* line 99, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-time {
   display: inline-block;
   float: left;
   margin: 0 10px;
 }
-/* line 105, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-title {
   display: block;
   overflow: hidden;
 }
-/* line 109, ../sass/ding_event_calendar.scss */
 .event-items .event-item .event-title a {
   text-decoration: underline;
 }
 
-/* line 116, ../sass/ding_event_calendar.scss */
 .event-day-header {
   text-align: center;
   font-weight: bold;
@@ -117,7 +92,6 @@
   font-size: 140%;
 }
 
-/* line 123, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev {
   border-radius: 50px;
   background-color: #00CAFE;
@@ -127,11 +101,9 @@
   text-indent: -9999px;
   line-height: 0;
 }
-/* line 132, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev:hover {
   text-decoration: none;
 }
-/* line 136, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .prev:after {
   display: block;
   text-indent: -2px;
@@ -141,7 +113,6 @@
   font-family: 'FontAwesome';
 }
 
-/* line 146, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next {
   border-radius: 50px;
   background-color: #00CAFE;
@@ -151,11 +122,9 @@
   text-indent: -9999px;
   line-height: 0;
 }
-/* line 155, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next:hover {
   text-decoration: none;
 }
-/* line 159, ../sass/ding_event_calendar.scss */
 #eventsCalendar .navi-heading .next:after {
   display: block;
   text-indent: 2px;

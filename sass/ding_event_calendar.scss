@@ -1,3 +1,5 @@
+@import "_mixins";
+
 $list-item-background-color-odd: #e8e8e8 !default;
 $list-item-background-color-even: #f2f2f2 !default;
 
@@ -76,6 +78,14 @@ $list-item-background-color-even: #f2f2f2 !default;
           }
         }
       }
+    }
+
+     // Media small
+
+    @include small() {
+      table-layout: fixed;
+      margin: 0 auto;
+      min-width: 280px;
     }
   }
 }

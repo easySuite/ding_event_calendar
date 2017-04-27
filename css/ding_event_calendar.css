@@ -1,100 +1,163 @@
+/**
+ * Mixins
+ *
+ * @author magnify
+ */
+/* Breakpoints
+   ========================================================================== */
+/* Media query
+   ========================================================================== */
+/* Breakpoints
+   ========================================================================== */
+/* Typography mixins
+ *
+ * These are mixins to allow for use in media queries
+   ========================================================================== */
+/* Availability
+   ========================================================================== */
+/* Pseudo arrow
+ *
+ * Usage example: pseudo-arrow(10px, #000, top, center, $offset: 20px)
+   ========================================================================== */
 #eventsCalendar .navi-heading {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
-
 #eventsCalendar .navi-heading h2 {
-    display: inline-block;
+  display: inline-block;
 }
-
 #eventsCalendar .navi-heading .control {
-    margin-top: 7px;
+  margin-top: 7px;
 }
-
 #eventsCalendar .navi-heading .next {
-    float: right;
+  float: right;
 }
-
 #eventsCalendar .navi-heading .prev {
-    float: left;
+  float: left;
 }
-
 #eventsCalendar #calendar {
-    width: 100%;
+  width: 100%;
 }
-
 #eventsCalendar #calendar a {
-    text-decoration: underline;
-    width: 100%;
-    height: 100%;
+  text-decoration: underline;
+  width: 100%;
+  height: 100%;
 }
-
 #eventsCalendar #calendar tr:nth-child(odd) {
-    background-color: #e8e8e8;
+  background-color: #e8e8e8;
 }
-
 #eventsCalendar #calendar tr:nth-child(even) {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
-
 #eventsCalendar #calendar tr .calendar-day-head {
-    background: #d5d5d5;
-    font-weight: bold;
+  background: #d5d5d5;
+  font-weight: bold;
 }
-
 #eventsCalendar #calendar tr td {
-    text-align: center;
-    width: 13.14%;
+  text-align: center;
+  width: 13.14%;
 }
-
-#eventsCalendar #calendar tr td.calendar-day.current-day {
-    background-color: #00caff;
-    cursor: pointer;
+#eventsCalendar #calendar tr td.calendar-day.has-events {
+  background-color: #999;
 }
-
+#eventsCalendar #calendar tr td.calendar-day.has-events a {
+  color: #fff;
+}
+#eventsCalendar #calendar tr td.calendar-day.has-events.selected {
+  background-color: #00caff;
+}
+#eventsCalendar #calendar tr td.calendar-day.has-events.selected a {
+  color: #fff;
+}
+#eventsCalendar #calendar tr td.calendar-day.current-day .day-number {
+  font-weight: bold;
+}
 #eventsCalendar #calendar tr td.calendar-day.current-day a {
-    color: #fff;
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  font-weight: bold;
+}
+@media only screen and (max-width: 480px) {
+  #eventsCalendar #calendar {
+    table-layout: fixed;
+    margin: 0 auto;
+    min-width: 280px;
+  }
 }
 
 .event-items {
-    width: 100%;
-    height: auto;
-    max-height: 200px;
-    overflow-y: auto;
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  overflow-y: auto;
 }
-
 .event-items .event-item {
-    padding: 6px;
+  padding: 6px;
 }
-
 .event-items .event-item:nth-child(odd) {
-    background-color: #e8e8e8;
+  background-color: #e8e8e8;
 }
-
 .event-items .event-item:nth-child(even) {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
-
 .event-items .event-item .event-time {
-    display: inline-block;
-    float: left;
-    margin: 0 10px;
+  display: inline-block;
+  float: left;
+  margin: 0 10px;
 }
-
 .event-items .event-item .event-title {
-    display: block;
-    overflow: hidden;
+  display: block;
+  overflow: hidden;
 }
-
 .event-items .event-item .event-title a {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .event-day-header {
-    text-align: center;
-    font-weight: bold;
-    margin: 10px 0 5px;
-    font-size: 140%;
+  text-align: center;
+  font-weight: bold;
+  margin: 10px 0 5px;
+  font-size: 140%;
+}
+
+#eventsCalendar .navi-heading .prev {
+  border-radius: 50px;
+  background-color: #00CAFE;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  text-indent: -9999px;
+  line-height: 0;
+}
+#eventsCalendar .navi-heading .prev:hover {
+  text-decoration: none;
+}
+#eventsCalendar .navi-heading .prev:after {
+  display: block;
+  text-indent: -2px;
+  line-height: 30px;
+  content: '\f053';
+  text-align: center;
+  font-family: 'FontAwesome';
+}
+
+#eventsCalendar .navi-heading .next {
+  border-radius: 50px;
+  background-color: #00CAFE;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  text-indent: -9999px;
+  line-height: 0;
+}
+#eventsCalendar .navi-heading .next:hover {
+  text-decoration: none;
+}
+#eventsCalendar .navi-heading .next:after {
+  display: block;
+  text-indent: 2px;
+  line-height: 30px;
+  content: '\f054';
+  text-align: center;
+  font-family: 'FontAwesome';
 }

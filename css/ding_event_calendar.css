@@ -19,12 +19,21 @@
  *
  * Usage example: pseudo-arrow(10px, #000, top, center, $offset: 20px)
    ========================================================================== */
+.table-bordered th,
+table tr,
+.table-bordered td,
+table td {
+  border-left: 1px solid #d5d5d5;
+  border-top: 1px solid #d5d5d5;
+}
+
 #eventsCalendar .navi-heading {
   text-align: center;
   vertical-align: middle;
 }
 #eventsCalendar .navi-heading h2 {
   display: inline-block;
+  text-transform: lowercase;
 }
 #eventsCalendar .navi-heading .control {
   margin-top: 7px;
@@ -52,6 +61,8 @@
 #eventsCalendar #calendar tr .calendar-day-head {
   background: #d5d5d5;
   font-weight: bold;
+  text-transform: lowercase;
+  font-size: 16px;
 }
 #eventsCalendar #calendar tr td {
   text-align: center;
@@ -64,7 +75,7 @@
   color: #fff;
 }
 #eventsCalendar #calendar tr td.calendar-day.has-events.selected {
-  background-color: #00caff;
+  background-color: #4d898e;
 }
 #eventsCalendar #calendar tr td.calendar-day.has-events.selected a {
   color: #fff;
@@ -83,6 +94,16 @@
     margin: 0 auto;
     min-width: 280px;
   }
+}
+#eventsCalendar .slick-slider {
+  margin-bottom: 12px;
+}
+#eventsCalendar .slick-slider .slick-arrow.slick-prev {
+  left: 0;
+}
+
+.panel-pane.pane-ding-event-calendar-ding-event-calendar .more-link {
+  float: right;
 }
 
 .event-items {
@@ -118,46 +139,4 @@
   font-weight: bold;
   margin: 10px 0 5px;
   font-size: 140%;
-}
-
-#eventsCalendar .navi-heading .prev {
-  border-radius: 50px;
-  background-color: #00CAFE;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  text-indent: -9999px;
-  line-height: 0;
-}
-#eventsCalendar .navi-heading .prev:hover {
-  text-decoration: none;
-}
-#eventsCalendar .navi-heading .prev:after {
-  display: block;
-  text-indent: -2px;
-  line-height: 30px;
-  content: '\f053';
-  text-align: center;
-  font-family: 'FontAwesome';
-}
-
-#eventsCalendar .navi-heading .next {
-  border-radius: 50px;
-  background-color: #00CAFE;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  text-indent: -9999px;
-  line-height: 0;
-}
-#eventsCalendar .navi-heading .next:hover {
-  text-decoration: none;
-}
-#eventsCalendar .navi-heading .next:after {
-  display: block;
-  text-indent: 2px;
-  line-height: 30px;
-  content: '\f054';
-  text-align: center;
-  font-family: 'FontAwesome';
 }

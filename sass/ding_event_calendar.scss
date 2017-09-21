@@ -3,6 +3,14 @@
 $list-item-background-color-odd: #e8e8e8 !default;
 $list-item-background-color-even: #f2f2f2 !default;
 
+.table-bordered th,
+table tr,
+.table-bordered td,
+table td {
+  border-left: 1px solid #d5d5d5;
+  border-top: 1px solid #d5d5d5;
+}
+
 #eventsCalendar {
 
   .navi-heading {
@@ -10,6 +18,7 @@ $list-item-background-color-even: #f2f2f2 !default;
     vertical-align: middle;
     h2 {
       display: inline-block;
+      text-transform: lowercase;
     }
     .control {
       margin-top: 7px;
@@ -42,9 +51,9 @@ $list-item-background-color-even: #f2f2f2 !default;
       .calendar-day-head {
         background: #d5d5d5;
         font-weight: bold;
-
+        text-transform: lowercase;
+        font-size: 16px;
       }
-
 
       td {
         text-align: center;
@@ -59,7 +68,7 @@ $list-item-background-color-even: #f2f2f2 !default;
         }
 
         &.calendar-day.has-events.selected {
-          background-color: #00caff;
+          background-color: #4d898e;
 
           a {
             color: #fff;
@@ -87,6 +96,21 @@ $list-item-background-color-even: #f2f2f2 !default;
       margin: 0 auto;
       min-width: 280px;
     }
+  }
+
+  .slick-slider {
+    margin-bottom: 12px;
+
+    .slick-arrow.slick-prev {
+      left: 0;
+    }
+  }
+
+}
+
+.panel-pane.pane-ding-event-calendar-ding-event-calendar {
+  .more-link {
+    float: right;
   }
 }
 
@@ -129,50 +153,4 @@ $list-item-background-color-even: #f2f2f2 !default;
   font-weight: bold;
   margin: 10px 0 5px;
   font-size: 140%;
-}
-
-#eventsCalendar .navi-heading .prev {
-  border-radius: 50px;
-  background-color: #00CAFE;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  text-indent: -9999px;
-  line-height:0;
-
-  &:hover{
-    text-decoration: none;
-  }
-
-  &:after {
-    display: block;
-    text-indent: -2px;
-    line-height: 30px;
-    content: '\f053';
-    text-align: center;
-    font-family: 'FontAwesome';
-  }
-}
-
-#eventsCalendar .navi-heading .next {
-  border-radius: 50px;
-  background-color: #00CAFE;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  text-indent: -9999px;
-  line-height:0;
-
-  &:hover{
-    text-decoration: none;
-  }
-
-  &:after {
-    display: block;
-    text-indent: 2px;
-    line-height: 30px;
-    content: '\f054';
-    text-align: center;
-    font-family: 'FontAwesome';
-  }
 }

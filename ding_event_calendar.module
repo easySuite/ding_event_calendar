@@ -149,18 +149,18 @@ function draw_controls() {
   $next_month_link = l(
     t('>>>'),
     'calendar/' . ($month != 12 ? $month + 1 : 1) . '/' . ($month != 12 ? $year : $year + 1) . '/nojs',
-    array('attributes' => array('class' => 'use-ajax control next'))
+    array('attributes' => array('class' => 'use-ajax control slick-arrow slick-next'))
   );
 
   /* "previous month" control */
   $previous_month_link = l(
     t('<<<'),
     'calendar/' . ($month != 1 ? $month - 1 : 12) . '/' . ($month != 1 ? $year : $year - 1) . '/nojs',
-    array('attributes' => array('class' => 'use-ajax control prev'))
+    array('attributes' => array('class' => 'use-ajax control slick-arrow slick-prev '))
   );
 
   /* bringing the controls together */
-  $controls = '<div class="navi-heading">' . $previous_month_link . '<h2>' . $rendered_month . '</h2>' . $next_month_link . ' </div>';
+  $controls = '<div class="navi-heading slick-slider">' . $previous_month_link . '<h2>' . $rendered_month . '</h2>' . $next_month_link . ' </div>';
 
   return $controls;
 }

@@ -97,6 +97,7 @@ table td {
 }
 #eventsCalendar .slick-slider {
   margin-bottom: 12px;
+  position: relative;
 }
 #eventsCalendar .slick-slider .slick-arrow.slick-prev {
   left: 0;

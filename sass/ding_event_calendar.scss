@@ -1,4 +1,4 @@
-@import "_mixins";
+@import "../../../themes/ddbasic/sass/_base.scss";
 
 $list-item-background-color-odd: #e8e8e8 !default;
 $list-item-background-color-even: #f2f2f2 !default;
@@ -63,15 +63,15 @@ table td {
           background-color: #999;
          
           a {
-            color: #fff;
+            color: $white;
           }
         }
 
         &.calendar-day.has-events.selected {
-          background-color: #4d898e;
+          background-color: $color-text-link;
 
           a {
-            color: #fff;
+            color: $white;
           }
         }
 
@@ -91,7 +91,7 @@ table td {
 
      // Media small
 
-    @include small() {
+     @include media($mobile) {
       table-layout: fixed;
       margin: 0 auto;
       min-width: 280px;

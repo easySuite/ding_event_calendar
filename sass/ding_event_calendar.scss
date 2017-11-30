@@ -3,22 +3,26 @@
 $list-item-background-color-odd: #e8e8e8 !default;
 $list-item-background-color-even: #f2f2f2 !default;
 
-.table-bordered th,
-table tr,
-.table-bordered td,
-table td {
-  border-left: 1px solid #d5d5d5;
-  border-top: 1px solid #d5d5d5;
-}
-
 #eventsCalendar {
+  .table-bordered th,
+  table tr,
+  .table-bordered td,
+  table td {
+    border-left: 1px solid $grey-medium;
+    border-top: 1px solid $grey-medium;
+  }
+
+  table td {
+    padding: 10px;
+  }
 
   .navi-heading {
     text-align: center;
     vertical-align: middle;
     h2 {
       display: inline-block;
-      text-transform: lowercase;
+      text-transform: uppercase;
+      margin-bottom: 8px;
     }
     .control {
       margin-top: 7px;
@@ -49,7 +53,7 @@ table td {
       }
 
       .calendar-day-head {
-        background: #d5d5d5;
+        background-color: $grey-medium;
         font-weight: bold;
         text-transform: lowercase;
         font-size: 16px;
@@ -59,8 +63,14 @@ table td {
         text-align: center;
         width: 13.14%;
 
+        &.calendar-day {
+          .day-number {
+            font-size: 110%;
+          }
+        }
+
         &.calendar-day.has-events {
-          background-color: #999;
+          background-color: $grey-dark;
          
           a {
             color: $white;
@@ -72,18 +82,6 @@ table td {
 
           a {
             color: $white;
-          }
-        }
-
-        &.calendar-day.current-day {
-          .day-number {
-            font-weight: bold;
-          }
-
-          a {
-            width: 100%;
-            height: 100%;
-            font-weight: bold;
           }
         }
       }
@@ -112,6 +110,7 @@ table td {
 .panel-pane.pane-ding-event-calendar-ding-event-calendar {
   .more-link {
     float: right;
+    margin-top: 15px;
   }
 }
 
@@ -149,9 +148,12 @@ table td {
   }
 }
 
-.event-day-header {
-  text-align: center;
-  font-weight: bold;
-  margin: 10px 0 5px;
-  font-size: 140%;
+#eventList {
+  border: 1px solid $grey-medium;
+
+  .event-day-header {
+    text-align: center;
+    margin: 15px 0 10px;
+    font-size: 120%;
+  }
 }

@@ -8,8 +8,7 @@ $list-item-background-color-even: #f2f2f2 !default;
   table tr,
   .table-bordered td,
   table td {
-    border-left: 1px solid $grey-medium;
-    border-top: 1px solid $grey-medium;
+    border: 1px solid $grey-medium;
   }
 
   table td {

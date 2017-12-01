@@ -77,8 +77,7 @@
 #eventsCalendar table tr,
 #eventsCalendar .table-bordered td,
 #eventsCalendar table td {
-  border-left: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  border: 1px solid #ccc;
 }
 #eventsCalendar table td {
   padding: 10px;

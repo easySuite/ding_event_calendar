@@ -158,6 +158,9 @@
   float: right;
   margin-top: 15px;
 }
+.panel-pane.pane-ding-event-calendar-ding-event-calendar .pane-title {
+  font-size: 34px;
+}
 
 .event-items {
   width: 100%;

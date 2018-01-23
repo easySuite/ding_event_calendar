@@ -5,7 +5,7 @@
  */
 ?>
 <div class="event-day-header">
-  <?php print $date; ?>
+  <strong><?php print $date; ?></strong>
 </div>
 <div class="event-items">
   <?php foreach ($items as $item): ?>

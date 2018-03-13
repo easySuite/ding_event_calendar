@@ -131,18 +131,12 @@ function draw_controls() {
   global $language;
 
   $month = (int) (arg(1) ? arg(1) : date('m'));
+  if (!$month) {
+    $month = date('m');
+  }
   $year = (int) (arg(2) ? arg(2) : date('Y'));
 
-  if ($month) {
-    $dateObj = DateTime::createFromFormat('!m', $month);
-    $rendered_month = $dateObj->format('F');
-  }
-  else {
-    $dateObj = DateTime::createFromFormat('!m', date('m'));
-    $rendered_month = $dateObj->format('F');
-  }
-
-  $rendered_month = format_date(strtotime($rendered_month), 'custom', 'F', NULL, $language->language);
+  $rendered_month = format_date(strtotime(date("01-$month-$year")), 'custom', 'F', NULL, $language->language);
 
   drupal_add_library('system', 'drupal.ajax');
   /* "next month" control */

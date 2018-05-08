@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Module's installation/uninstallation behaviours.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function ding_event_calendar_enable() {
+  variable_set('ding_event_calendar_limit', '');
+  variable_set('ding_event_calendar_library_order', array());
+}
+
+/**
+ * Implements hook_disable().
+ */
+function ding_event_calendar_disable() {
+  variable_del('ding_event_calendar_limit');
+  variable_del('ding_event_calendar_library_order');
+}

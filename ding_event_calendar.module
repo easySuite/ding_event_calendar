@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Ding event calendar module.
@@ -123,7 +124,6 @@ function _ding_event_calendar_events($date) {
   return '<div id="eventList">' . get_events($date) . '</div>';
 }
 
-
 /**
  * Rendering calendar navigation.
  */
@@ -183,7 +183,6 @@ function draw_calendar($month, $year) {
   $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
   $days_in_this_week = 1;
   $day_counter = 0;
-  $dates_array = array();
 
   /* row for week one */
   $calendar .= '<tr class="calendar-row">';
@@ -259,24 +258,88 @@ function draw_calendar($month, $year) {
 
 /**
  * Fetching events list from database.
+ *
+ * @param string $date
+ *   Curent calendar date.
+ *
+ * @throws \Exception
  */
 function get_events($date) {
   global $language;
 
+  $limit = variable_get('ding_event_calendar_limit', '');
+  $order = variable_get('ding_event_calendar_library_order', array());
+
+  // Loading data from nodequeue in case when variable is empty.
+  if (empty($order)) {
+    $nodequeue = nodequeue_load_queue_by_name('ding_library_listing');
+    $libraries = nodequeue_load_nodes($nodequeue->qid);
+    foreach ($libraries as $key => $library) {
+      $order[] = $key;
+    }
+  }
+
   $rendering_date = format_date(strtotime($date), 'ding_date_only', NULL, NULL, $language->language);
 
-  $result = db_query("select n.nid from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :date order by ed.field_ding_event_date_value asc",
-    array(
-      ':date' => $date,
-      ':tz' => date('P'),
-    ))->fetchAll();
+  if (empty($limit)) {
+    $result = db_query("
+select n.nid 
+from {node} n 
+inner join {field_data_field_ding_event_date} ed 
+where n.nid=ed.entity_id 
+and 
+DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :date 
+and 
+DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :date 
+order by ed.field_ding_event_date_value asc",
+      array(
+        ':date' => $date,
+        ':tz' => date('P'),
+      ))->fetchAll();
+  }
+  else {
+    $result = db_query_range("
+select n.nid 
+from {node} n 
+inner join {field_data_field_ding_event_date} ed 
+where n.nid=ed.entity_id 
+and 
+DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :date 
+and 
+DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :date 
+order by ed.field_ding_event_date_value asc", 0, $limit,
+      array(
+        ':date' => $date,
+        ':tz' => date('P'),
+      ))->fetchAll();
+  }
 
   $items = array();
   foreach ($result as $item) {
-    $items[$item->nid] = node_load($item->nid);
+    $node = node_load($item->nid);
+    $items[$node->og_group_ref[LANGUAGE_NONE][0]['target_id']][$node->nid] = $node;
   }
+
+  // Sort libraries in array by library weight in nodequeue.
+  $sorted = array_map(function ($v) use ($items) {
+    return $items[$v];
+  }, $order);
+
+  // Removing empty elements of array.
+  $sorted = array_filter($sorted);
+
+  // Extracting node id's in new order.
+  $returned_items = array();
+  foreach ($sorted as $k => $item) {
+    if (!empty($item)) {
+      foreach ($item as $nod) {
+        $returned_items[] = $nod;
+      }
+    }
+  }
+
   return theme('ding_events_list', array(
-    'items' => $items,
+    'items' => $returned_items,
     'date' => $rendering_date,
   ));
 }
@@ -291,5 +354,126 @@ function ding_event_calendar_theme($existing, $type, $theme, $path) {
       'path' => $path . '/templates',
       'template' => 'events-list',
     ),
+    'ctools_block_content_type_edit_form' => array(
+      'render element' => 'form',
+    ),
   );
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ding_event_calendar_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'ctools_block_content_type_edit_form' && $form_state['pane']->subtype == 'ding_event_calendar-ding-event-calendar') {
+    // Adding items limit field.
+    $limit = variable_get('ding_event_calendar_limit', '');
+    $form['limit'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Limit'),
+      '#description' => t('Limit amount of items in event list. If field value is "empty" or "0", all available items will be shown.'),
+      '#size' => 10,
+      '#weight' => '10',
+      '#default_value' => !empty($limit) ? $limit : '',
+    );
+
+    // Implementing draggable table functionality in form.
+    $nodes = array();
+    $ordered_nodes = variable_get('ding_event_calendar_library_order', array());
+    if (!empty($ordered_nodes)) {
+      foreach ($ordered_nodes as $ordered_node) {
+        $nodes[$ordered_node] = node_load($ordered_node);
+      }
+    }
+    else {
+      $nodequeue = nodequeue_load_queue_by_name('ding_library_listing');
+      $nodes = nodequeue_load_nodes($nodequeue->qid);
+    }
+
+    $form['order_libraries_fieldset'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Order libraries'),
+      '#description' => t('Set the priorities for libraries. Outputted event items will be sorted by this values.'),
+      '#weight' => 12,
+    );
+
+    $form['order_libraries_fieldset']['#attached']['js'][] = array(
+      'data' => drupal_get_path('module', 'ding_event_calendar') . '/js/ding_event_calendar.admin.js',
+      'type' => 'file',
+    );
+
+    $form['order_libraries']['#tree'] = TRUE;
+
+    foreach ($nodes as $node) {
+      $form['order_libraries'][$node->nid] = array(
+        'title' => array(
+          '#markup' => check_plain($node->title),
+        ),
+        'weight' => array(
+          '#type' => 'weight',
+          '#title' => t('Weight'),
+          '#default_value' => '',
+          '#delta' => 10,
+          '#title_display' => 'invisible',
+        ),
+      );
+    }
+
+    // Custom submit callback.
+    $form['#submit'][] = 'ding_event_calendar_settings_form_submit';
+  }
+}
+
+/**
+ * Theming draggable table.
+ *
+ * @throws \Exception
+ */
+function theme_ctools_block_content_type_edit_form($variables) {
+  $form = $variables['form'];
+  $rows = array();
+
+  foreach (element_children($form['order_libraries']) as $id) {
+    $form['order_libraries'][$id]['weight']['#attributes']['class'] = array('library-item-weight');
+
+    $rows[] = array(
+      'data' => array(
+        drupal_render($form['order_libraries'][$id]['title']),
+        drupal_render($form['order_libraries'][$id]['weight']),
+      ),
+      'class' => array('draggable'),
+    );
+  }
+
+  $header = array(t('Title'), t('Weight'));
+  $table_id = 'library-items-table';
+
+  $output = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => $table_id),
+    'sticky' => FALSE,
+  ));
+
+  $output .= drupal_render_children($form);
+  drupal_add_tabledrag($table_id, 'order', 'sibling', 'library-item-weight');
+
+  return $output;
+}
+
+/**
+ * Calendar block settings form submit callback.
+ */
+function ding_event_calendar_settings_form_submit($form, &$form_state) {
+  // Process items limit.
+  variable_set('ding_event_calendar_limit', $form_state['values']['limit']);
+
+  // Process order of libraries.
+  $order = $form_state['input']['order_libraries'];
+
+  $new_order = array();
+  foreach ($order as $nid => $item) {
+    $new_order[] = $nid;
+  }
+
+  variable_set('ding_event_calendar_library_order', $new_order);
 }

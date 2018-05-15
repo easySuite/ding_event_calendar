@@ -27,10 +27,10 @@
         </a>
       </div>
       <div class="info-event">
-      <?php if (!empty($raw_location)) : ?>
+        <?php if (!empty($raw_location)) : ?>
           <div class="event-location"><?php print l($raw_location[0]['#markup'], 'node/' . $raw_location['#items'][0]['target_id']); ?></div>
         <?php endif; ?>
-        <div class="event-time"> <span><?php print $event_time; ?></span></div>
+        <div class="event-time"><?php print $event_time; ?></div>
         <?php if (!empty($raw_category)) : ?>
           <div class="event-category"><?php print render($raw_category); ?></div>
         <?php endif; ?>

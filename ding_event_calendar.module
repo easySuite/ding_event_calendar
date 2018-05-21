@@ -322,7 +322,9 @@ function get_events($date) {
 
   // Sort libraries in array by library weight in nodequeue.
   $sorted = array_map(function ($v) use ($items) {
-    return $items[$v];
+    if (!empty($items[$v])) {
+      return $items[$v];
+    }
   }, $order);
 
   // Removing empty elements of array.

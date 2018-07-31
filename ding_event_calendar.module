@@ -198,11 +198,31 @@ function draw_calendar($month, $year) {
     $form_date = $year . '-' . sprintf("%02s", $month) . '-' . sprintf("%02s", $list_day);
 
     /* add in the day number */
-    $event_day = db_query("select count(*) from {node} n inner join {field_data_field_ding_event_date} ed where n.nid=ed.entity_id and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :tz), '%Y-%m-%d') <= :form_date and DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :tz), '%Y-%m-%d') >= :form_date",
-      array(
-        ':form_date' => $form_date,
-        ':tz' => date('P'),
-      ))->fetchField();
+    $query = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.type', 'ding_event', '=')
+      ->condition('n.status', 1, '=');
+    $query->addJoin('INNER', 'field_data_field_ding_event_date', 'ed', 'n.nid=ed.entity_id');
+    $query->where("DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :timezone), '%Y-%m-%d') <= :date", array(':timezone' => date('P'), ':date' => $form_date));
+    $query->where("DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :timezone), '%Y-%m-%d') >= :date", array(':timezone' => date('P'), ':date' => $form_date));
+
+    if (module_exists('domain')) {
+      $domain = domain_get_domain();
+      if (!empty(variable_get('culture_frontend_enable_ding_event_calendar_domain_' . $domain['domain_id'], FALSE))) {
+        $query->addJoin(
+          'INNER',
+          'domain_access',
+          'da',
+          "n.nid=da.nid AND ((da.realm = 'domain_id' AND da.gid=:domain_id) OR (da.realm = 'domain_site' AND da.gid = :domain_id))",
+          array(
+            ':domain_id' => $domain['domain_id'],
+          )
+        );
+      }
+    }
+    if ($query) {
+      $event_day = $query->execute()->rowCount();
+    }
 
     if (empty($event_day)) {
       $list_day_printed = $list_day;
@@ -261,8 +281,6 @@ function draw_calendar($month, $year) {
  *
  * @param string $date
  *   Curent calendar date.
- *
- * @throws \Exception
  */
 function get_events($date) {
   global $language;

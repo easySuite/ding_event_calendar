@@ -405,8 +405,11 @@ function ding_event_calendar_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     else {
+      $library_query = db_select('node', 'n')->condition('type', 'ding_library')->condition('status', 1);
+      $library_nodes_count = $library_query->countQuery()->execute()->fetchField();
+
       $nodequeue = nodequeue_load_queue_by_name('ding_library_listing');
-      $nodes = nodequeue_load_nodes($nodequeue->qid);
+      $nodes = nodequeue_load_nodes($nodequeue->qid, FALSE, 0, $library_nodes_count);
     }
 
     $form['order_libraries_fieldset'] = array(

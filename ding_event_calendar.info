@@ -2,4 +2,4 @@ name = Ding event calendar
 description = Simple calendar block with selected day events list
 core = 7.x
 package = easyOPAC
-version = 7.x-4.2.1
+version = 7.x-4.4.2

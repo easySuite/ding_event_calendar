@@ -397,19 +397,10 @@ function ding_event_calendar_form_alter(&$form, &$form_state, $form_id) {
     );
 
     // Implementing draggable table functionality in form.
-    $nodes = array();
-    $ordered_nodes = variable_get('ding_event_calendar_library_order', array());
-    if (!empty($ordered_nodes)) {
-      foreach ($ordered_nodes as $ordered_node) {
-        $nodes[$ordered_node] = node_load($ordered_node);
-      }
-    }
-    else {
-      $library_query = db_select('node', 'n')->condition('type', 'ding_library')->condition('status', 1);
-      $library_nodes_count = $library_query->countQuery()->execute()->fetchField();
+    $library_node_ids = ding_event_calendar_get_library_nodes();
 
-      $nodequeue = nodequeue_load_queue_by_name('ding_library_listing');
-      $nodes = nodequeue_load_nodes($nodequeue->qid, FALSE, 0, $library_nodes_count);
+    foreach ($library_node_ids as $array_key => $library_node_id) {
+      $nodes[$library_node_id] = node_load($library_node_id);
     }
 
     $form['order_libraries_fieldset'] = array(
@@ -444,6 +435,67 @@ function ding_event_calendar_form_alter(&$form, &$form_state, $form_id) {
     // Custom submit callback.
     $form['#submit'][] = 'ding_event_calendar_settings_form_submit';
   }
+}
+
+/**
+ * Check library nodes list for any changes and return needed nodes.
+ *
+ * @return array|null
+ *   Array of library nodes.
+ */
+function ding_event_calendar_get_library_nodes() {
+  // Get ding_event_calendar settings value.
+  $ordered_nodes = variable_get('ding_event_calendar_library_order', []);
+
+  // Get count of library nodes registered in database.
+  $library_query = db_select('node', 'n')
+    ->condition('type', 'ding_library')
+    ->condition('status', 1);
+  // Get count of Library CT nodes in DB.
+  $library_nodes_count = $library_query->countQuery()->execute()->fetchField();
+
+  // Load Ding Library nodequeue.
+  $nodequeue = nodequeue_load_queue_by_name('ding_library_listing');
+  $nodes_raw = nodequeue_load_nodes($nodequeue->qid, FALSE, 0, $library_nodes_count);
+
+  // If count of items was changed, let's process them.
+  if (count($ordered_nodes) != $library_nodes_count) {
+    // If the Library CT node was deleted.
+    if (count($ordered_nodes) > $library_nodes_count) {
+      // Get the diff between variable and nodequeue list.
+      $diff = array_diff($ordered_nodes, array_keys($nodes_raw));
+      // Remove deleted library.
+      foreach ($diff as $k => $item) {
+        unset($ordered_nodes[$k]);
+      }
+    }
+    // If Library CT was added.
+    else {
+      // Merge both array to get full list on items.
+      $merge_arrays = array_merge($ordered_nodes, array_keys($nodes_raw));
+      // Get unique keys and preserve items order.
+      $ordered_nodes = array_unique($merge_arrays);
+    }
+  }
+  else {
+    // If the count of items is the same, we anyway need to validate data from
+    // arrays.
+    foreach ($ordered_nodes as $key => $value) {
+      // In case library was deleted and another added, we check if the node
+      // loaded is valid object, if not - remove this from array and process the
+      // new one.
+      if (!is_object(node_load($value))) {
+        // Remove stale item from array.
+        unset($ordered_nodes[$key]);
+        // Update $ordered_nodes list.
+        $merge_arrays = array_merge($ordered_nodes, array_keys($nodes_raw));
+        // Get unique keys and preserve items order.
+        $ordered_nodes = array_unique($merge_arrays);
+      }
+    }
+  }
+
+  return $ordered_nodes;
 }
 
 /**

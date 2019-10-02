@@ -10,7 +10,6 @@
  */
 function ding_event_calendar_enable() {
   variable_set('ding_event_calendar_limit', '');
-  variable_set('ding_event_calendar_library_order', array());
 }
 
 /**
@@ -18,5 +17,12 @@ function ding_event_calendar_enable() {
  */
 function ding_event_calendar_disable() {
   variable_del('ding_event_calendar_limit');
+  variable_del('ding_event_calendar_library_order');
+}
+
+/**
+ * Remove dependency of common used nodequeue.
+ */
+function ding_event_calendar_update_7001(&$sandbox) {
   variable_del('ding_event_calendar_library_order');
 }

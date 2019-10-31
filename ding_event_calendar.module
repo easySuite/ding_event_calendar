@@ -183,6 +183,7 @@ function draw_calendar($month, $year) {
   $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
   $days_in_this_week = 1;
   $day_counter = 0;
+  $classes = [];
 
   /* row for week one */
   $calendar .= '<tr class="calendar-row">';
@@ -200,9 +201,11 @@ function draw_calendar($month, $year) {
     /* add in the day number */
     $query = db_select('node', 'n')
       ->fields('n', array('nid'))
-      ->condition('n.type', 'ding_event', '=')
-      ->condition('n.status', 1, '=');
+      ->condition('n.type', 'ding_event')
+      ->condition('n.status', 1);
     $query->addJoin('INNER', 'field_data_field_ding_event_date', 'ed', 'n.nid=ed.entity_id');
+    $query->addField('ed', 'field_ding_event_date_value');
+    $query->addField('ed', 'field_ding_event_date_value2');
     $query->where("DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value, '+00:00', :timezone), '%Y-%m-%d') <= :date", array(':timezone' => date('P'), ':date' => $form_date));
     $query->where("DATE_FORMAT(CONVERT_TZ(field_ding_event_date_value2, '+00:00', :timezone), '%Y-%m-%d') >= :date", array(':timezone' => date('P'), ':date' => $form_date));
 
@@ -220,10 +223,29 @@ function draw_calendar($month, $year) {
         );
       }
     }
+    $classes[$form_date][] = 'calendar-day';
+
     if ($query) {
+      $events = $query->execute()->fetchAll();
       $event_day = $query->execute()->rowCount();
     }
 
+    if (!empty($events)) {
+      foreach ($events as $event) {
+        $begin = new DateTime($event->field_ding_event_date_value);
+        $end = new DateTime($event->field_ding_event_date_value2);
+        if ($begin->diff($end)->d > 0) {
+          $classes[$begin->format('Y-m-d')][] = 'event-start';
+          $classes[$end->format('Y-m-d')][] = 'event-end';
+
+          $interval = DateInterval::createFromDateString('1 day');
+          $period = new DatePeriod($begin->modify('+1 day'), $interval, $end->modify('-1 day'));
+          foreach ($period as $item) {
+            $classes[$item->format('Y-m-d')][] = 'event-progress';
+          }
+        }
+      }
+    }
     if (empty($event_day)) {
       $list_day_printed = $list_day;
     }
@@ -231,17 +253,16 @@ function draw_calendar($month, $year) {
       $list_day_printed = l($list_day, '/calendar/events/' . $form_date, array('attributes' => array('class' => 'use-ajax')));
     }
 
-    $classes = 'calendar-day';
-
     if ($form_date == date('Y-m-d')) {
-      $classes .= ' current-day';
+      $classes[$form_date][] = 'current-day';
     }
 
     if (!empty($event_day)) {
-      $classes .= ' has-events';
+      $classes[$form_date][] = 'has-events';
     }
 
-    $calendar .= "<td class='{$classes}'>";
+    $classes_str = implode(' ',array_unique($classes[$form_date]));
+    $calendar .= "<td class='{$classes_str}'>";
 
     $calendar .= '<div class="day-number">' . $list_day_printed . '</div>';
 

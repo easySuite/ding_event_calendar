@@ -239,7 +239,7 @@ function draw_calendar($month, $year) {
           $classes[$end->format('Y-m-d')][] = 'event-end';
 
           $interval = DateInterval::createFromDateString('1 day');
-          $period = new DatePeriod($begin->modify('+1 day'), $interval, $end->modify('-1 day'));
+          $period = new DatePeriod($begin->modify('+1 day'), $interval, $end);
           foreach ($period as $item) {
             $classes[$item->format('Y-m-d')][] = 'event-progress';
           }
